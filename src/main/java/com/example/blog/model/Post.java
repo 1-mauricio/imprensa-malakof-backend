@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "posts")
 public class Post {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(nullable = false)
@@ -20,14 +21,29 @@ public class Post {
     @Column(length = 255, nullable = true)
     private String category;
 
+    @Column(name = "date", nullable = false)
+    private LocalDateTime date;
+
+    @Column(name = "readTime", nullable = false)
+    private Integer readTime;
+
     @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    @Column(name = "createdAt", nullable = false)
-    private LocalDateTime createdAt;
-
     @Version
     private Integer version;
+
+    // Construtores
+    public Post() {}
+
+    public Post(String title, String subTitle, String category, LocalDateTime date, Integer readTime, String content) {
+        this.title = title;
+        this.subTitle = subTitle;
+        this.category = category;
+        this.date = date;
+        this.readTime = readTime;
+        this.content = content;
+    }
 
     // Getters e Setters
     public Long getId() {
@@ -46,40 +62,6 @@ public class Post {
         this.title = title;
     }
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    // Método chamado antes de persistir para atribuir data atual
-    @PrePersist
-    protected void onCreate() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "Post{" +
-                "id=" + id +
-                ", titulo='" + title + '\'' +
-                ", conteudo='" + content + '\'' +
-                ", dataPublicacao=" + createdAt +
-                '}';
-    }
-
     public String getSubTitle() {
         return subTitle;
     }
@@ -94,5 +76,59 @@ public class Post {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public LocalDateTime getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDateTime date) {
+        this.date = date;
+    }
+
+    public Integer getReadTime() {
+        return readTime;
+    }
+
+    public void setReadTime(Integer readTime) {
+        this.readTime = readTime;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+
+    // Método chamado antes de persistir para atribuir data atual
+    @PrePersist
+    protected void onCreate() {
+        if (date == null) {
+            date = LocalDateTime.now();
+        }
+    }
+
+    // Método toString
+    @Override
+    public String toString() {
+        return "Post{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", subTitle='" + subTitle + '\'' +
+                ", category='" + category + '\'' +
+                ", date=" + date +
+                ", readTime=" + readTime +
+                ", content='" + content + '\'' +
+                '}';
     }
 }

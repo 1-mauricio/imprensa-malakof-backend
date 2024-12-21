@@ -20,31 +20,34 @@ public class PostController {
     @Autowired
     private PostService postService;
 
+    // Criar um novo post
     @PostMapping
     public ResponseEntity<Post> createPost(@RequestBody Post post) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        post.setDate(null);  // Garante que o campo 'date' será atribuído corretamente no serviço, não vindo do corpo da requisição
         Post savedPost = postService.createPost(post);
         return new ResponseEntity<>(savedPost, HttpStatus.CREATED);
     }
 
+    // Obter todos os posts
     @GetMapping
     public ResponseEntity<List<Post>> getAllPosts() {
         List<Post> posts = postService.getAllPosts();
         return new ResponseEntity<>(posts, HttpStatus.OK);
     }
 
+    // Obter um post específico por id
     @GetMapping("/{id}")
     public ResponseEntity<Post> getPostById(@PathVariable Long id) {
         Optional<Post> post = postService.getPostById(id);
-        System.out.println(post);
         if (post.isPresent()) {
-            System.out.println(post.get());
             return new ResponseEntity<>(post.get(), HttpStatus.OK);
         } else {
             return ResponseEntity.notFound().build();
         }
     }
 
+    // Atualizar um post específico
     @PutMapping("/{id}")
     public ResponseEntity<Post> updatePost(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         return postService.getPostById(id)
@@ -59,7 +62,7 @@ public class PostController {
                         existingPost.setSubTitle((String) updates.get("subTitle"));
                     }
 
-                    // Atualizar a categoria se fornecida
+                    // Atualizar a categoria se fornecido
                     if (updates.containsKey("category")) {
                         existingPost.setCategory((String) updates.get("category"));
                     }
@@ -69,18 +72,24 @@ public class PostController {
                         existingPost.setContent((String) updates.get("content"));
                     }
 
+                    // Atualizar o tempo de leitura se fornecido
+                    if (updates.containsKey("readTime")) {
+                        existingPost.setReadTime((Integer) updates.get("readTime"));
+                    }
+
+                    // Não atualizamos o campo 'date', pois ele é fixo e não deve ser alterado após a criação
+
                     // Salvar e retornar o post atualizado
                     return new ResponseEntity<>(postService.updatePost(existingPost), HttpStatus.OK);
                 })
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-
-
+    // Deletar um post específico
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable Long id) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
+        String username = auth.getName();  // Exemplo de como você pode pegar o usuário autenticado
 
         return postService.getPostById(id)
                 .map(post -> {
