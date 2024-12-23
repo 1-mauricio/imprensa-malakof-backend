@@ -9,7 +9,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
 public class BlogApplicationTests {
-/*
+
 	private static String jwtToken;
 
 	@BeforeAll
@@ -115,5 +115,5 @@ public class BlogApplicationTests {
 				.statusCode(204);
 	}
 
- */
+
 }
