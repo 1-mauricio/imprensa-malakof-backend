@@ -1,5 +1,6 @@
 package com.example.blog.controller;
 
+import com.example.blog.dtos.PostAnalyticsDto;
 import com.example.blog.model.Post;
 import com.example.blog.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,9 +37,7 @@ public class PostController {
     @GetMapping("/{id}")
     public ResponseEntity<Post> getPostById(@PathVariable Long id) {
         Optional<Post> post = postService.getPostById(id);
-        System.out.println(post);
         if (post.isPresent()) {
-            System.out.println(post.get());
             return new ResponseEntity<>(post.get(), HttpStatus.OK);
         } else {
             return ResponseEntity.notFound().build();

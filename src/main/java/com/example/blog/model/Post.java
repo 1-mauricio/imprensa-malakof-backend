@@ -2,6 +2,7 @@ package com.example.blog.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "posts")
@@ -33,7 +34,18 @@ public class Post {
     @Version
     private Integer version;
 
-    // Construtores
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<PostView> views;
+
+    @Transient
+    private Long viewCount;
+
+    @Transient
+    private Long viewsThisWeek;
+
+    @Transient
+    private Long viewsThisMonth;
+
     public Post() {}
 
     public Post(String title, String subTitle, String category, LocalDateTime date, Integer readTime, String content) {
@@ -110,7 +122,30 @@ public class Post {
         this.version = version;
     }
 
-    // Método chamado antes de persistir para atribuir data atual
+    public Long getViewCount() {
+        return viewCount;
+    }
+
+    public void setViewCount(Long viewCount) {
+        this.viewCount = viewCount;
+    }
+
+    public Long getViewsThisWeek() {
+        return viewsThisWeek;
+    }
+
+    public void setViewsThisWeek(Long viewsThisWeek) {
+        this.viewsThisWeek = viewsThisWeek;
+    }
+
+    public Long getViewsThisMonth() {
+        return viewsThisMonth;
+    }
+
+    public void setViewsThisMonth(Long viewsThisMonth) {
+        this.viewsThisMonth = viewsThisMonth;
+    }
+
     @PrePersist
     protected void onCreate() {
         if (date == null) {
