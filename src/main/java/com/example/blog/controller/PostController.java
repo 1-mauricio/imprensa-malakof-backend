@@ -44,6 +44,16 @@ public class PostController {
         }
     }
 
+    @GetMapping("/title")
+    public ResponseEntity<Post> getPostByTitle(@RequestParam String title) {
+        Optional<Post> post = postService.getPostByTitle(title);
+        if (post.isPresent()) {
+            return new ResponseEntity<>(post.get(), HttpStatus.OK);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Post> updatePost(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         return postService.getPostById(id)

@@ -34,6 +34,9 @@ public class Post {
     @Version
     private Integer version;
 
+    @Column(length = 255, nullable = true)
+    private String imageUrl;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<PostView> views;
 
@@ -48,13 +51,14 @@ public class Post {
 
     public Post() {}
 
-    public Post(String title, String subTitle, String category, LocalDateTime date, Integer readTime, String content) {
+    public Post(String title, String subTitle, String category, LocalDateTime date, Integer readTime, String content, String imageUrl) {
         this.title = title;
         this.subTitle = subTitle;
         this.category = category;
         this.date = date;
         this.readTime = readTime;
         this.content = content;
+        this.imageUrl = imageUrl;
     }
 
     // Getters e Setters
@@ -146,6 +150,14 @@ public class Post {
         this.viewsThisMonth = viewsThisMonth;
     }
 
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
     @PrePersist
     protected void onCreate() {
         if (date == null) {
@@ -153,7 +165,6 @@ public class Post {
         }
     }
 
-    // Método toString
     @Override
     public String toString() {
         return "Post{" +
@@ -164,6 +175,7 @@ public class Post {
                 ", date=" + date +
                 ", readTime=" + readTime +
                 ", content='" + content + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
                 '}';
     }
 }

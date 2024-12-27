@@ -32,6 +32,10 @@ public class PostService {
         PostView postView = new PostView();
         postView.setPost(post);
         postViewRepository.save(postView);
+
+        Long viewCount = postViewRepository.countViewsByPostId(postId);
+
+        post.setViewCount(viewCount);
     }
 
     public List<Post> getAllPosts() {
@@ -54,12 +58,20 @@ public class PostService {
 
         if (postOptional.isPresent()) {
             incrementPostView(id);
-
             Post post = postOptional.get();
 
-            Long viewCount = postViewRepository.countViewsByPostId(id);
+            return Optional.of(post);
+        } else {
+            return Optional.empty();
+        }
+    }
 
-            post.setViewCount(viewCount);
+    public Optional<Post> getPostByTitle(String title) {
+        Optional<Post> postOptional = postRepository.findByTitle(title);
+
+        if (postOptional.isPresent()) {
+            Post post = postOptional.get();
+            incrementPostView(post.getId());
 
             return Optional.of(post);
         } else {
