@@ -54,31 +54,35 @@ public class PostController {
         }
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<List<Post>> searchPosts(@RequestParam String searchTerm) {
+        List<Post> posts = postService.searchPosts(searchTerm);
+        if (posts.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return new ResponseEntity<>(posts, HttpStatus.OK);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Post> updatePost(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
         return postService.getPostById(id)
                 .map(existingPost -> {
-                    // Atualizar o título se fornecido
                     if (updates.containsKey("title")) {
                         existingPost.setTitle((String) updates.get("title"));
                     }
 
-                    // Atualizar o subtítulo se fornecido
                     if (updates.containsKey("subTitle")) {
                         existingPost.setSubTitle((String) updates.get("subTitle"));
                     }
 
-                    // Atualizar a categoria se fornecida
                     if (updates.containsKey("category")) {
                         existingPost.setCategory((String) updates.get("category"));
                     }
 
-                    // Atualizar o conteúdo se fornecido
                     if (updates.containsKey("content")) {
                         existingPost.setContent((String) updates.get("content"));
                     }
 
-                    // Salvar e retornar o post atualizado
                     return new ResponseEntity<>(postService.updatePost(existingPost), HttpStatus.OK);
                 })
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));

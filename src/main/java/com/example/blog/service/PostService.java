@@ -79,6 +79,10 @@ public class PostService {
         }
     }
 
+    public List<Post> searchPosts(String searchTerm) {
+        List<Post> posts = postRepository.findByTitleOrSubTitleOrContent(searchTerm);
+        return posts;
+    }
 
     public Post updatePost(Post post) {
         return postRepository.save(post);
