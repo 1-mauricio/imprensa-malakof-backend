@@ -54,6 +54,13 @@ public class PostController {
         }
     }
 
+    @GetMapping("/customLink")
+    public ResponseEntity<Post> getPostByCustomLink(@RequestParam String customLink) {
+        Optional<Post> post = postService.getPostByCustomLink(customLink);
+        return post.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/search")
     public ResponseEntity<List<Post>> searchPosts(@RequestParam String searchTerm) {
         List<Post> posts = postService.searchPosts(searchTerm);

@@ -39,15 +39,10 @@ public class PostService {
     }
 
     public List<Post> getAllPosts() {
-        List<Post> posts = postRepository.findAll();
+        List<Post> posts = postRepository.findAllByOrderByDateDesc();
 
         for (Post post : posts) {
-            Long viewCount = postViewRepository.countViewsByPostId(post.getId());
-            Long viewsThisWeek = postViewRepository.countViewsForPostInLastWeek(post.getId());
-            Long viewsThisMonth = postViewRepository.countViewsForPostInLastMonth(post.getId());
-            post.setViewCount(viewCount);
-            post.setViewsThisWeek(viewsThisWeek);
-            post.setViewsThisMonth(viewsThisMonth);
+            setPostViewCounts(post);
         }
 
         return posts;
@@ -59,6 +54,7 @@ public class PostService {
         if (postOptional.isPresent()) {
             incrementPostView(id);
             Post post = postOptional.get();
+            setPostViewCounts(post);
 
             return Optional.of(post);
         } else {
@@ -72,11 +68,33 @@ public class PostService {
         if (postOptional.isPresent()) {
             Post post = postOptional.get();
             incrementPostView(post.getId());
-
+            setPostViewCounts(post);
             return Optional.of(post);
         } else {
             return Optional.empty();
         }
+    }
+
+    public Optional<Post> getPostByCustomLink(String customLink) {
+        Optional<Post> postOptional = postRepository.findByCustomLink(customLink);
+
+        if (postOptional.isPresent()) {
+            Post post = postOptional.get();
+            incrementPostView(post.getId());
+            setPostViewCounts(post);
+            return Optional.of(post);
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private void setPostViewCounts(Post post) {
+        Long viewCount = postViewRepository.countViewsByPostId(post.getId());
+        Long viewsThisWeek = postViewRepository.countViewsForPostInLastWeek(post.getId());
+        Long viewsThisMonth = postViewRepository.countViewsForPostInLastMonth(post.getId());
+        post.setViewCount(viewCount);
+        post.setViewsThisWeek(viewsThisWeek);
+        post.setViewsThisMonth(viewsThisMonth);
     }
 
     public List<Post> searchPosts(String searchTerm) {
