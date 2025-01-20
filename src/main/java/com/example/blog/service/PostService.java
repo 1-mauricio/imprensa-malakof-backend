@@ -54,23 +54,24 @@ public class PostService {
 
     private Post mapResultToPost(Object[] result) {
         Post post = new Post();
-
-        post.setId((Long) result[0]); 
-        post.setTitle((String) result[1]); 
+        post.setId((Long) result[0]);
+        post.setTitle((String) result[6]);
         post.setContent((String) result[2]);
 
         if (result[3] instanceof java.sql.Timestamp) {
             post.setDate(((java.sql.Timestamp) result[3]).toLocalDateTime());
         }
 
-        post.setReadTime((Integer) result[4]); 
+        post.setReadTime((Integer) result[4]);
         post.setSubTitle((String) result[5]);
-        post.setCategory((String) result[6]);
-        post.setImageUrl((String) result[8]); 
+        post.setCategory((String) result[1]);
+        post.setImageUrl((String) result[8]);
+        post.setVersion((Integer) result[7]);
+        post.setCustomLink((String) result[9]);
 
-        post.setViewsThisWeek((Long) result[7]); 
-        post.setViewsThisMonth((Long) result[10]); 
-        post.setViewCount((Long) result[9]); 
+        post.setViewsThisWeek((Long) result[12]);
+        post.setViewsThisMonth((Long) result[11]);
+        post.setViewCount((Long) result[10]);
 
         return post;
     }
@@ -83,8 +84,8 @@ public class PostService {
 
             Post post = postOptional.get();
 
-            List<Post> posts = List.of(post); 
-            List<Long> postIds = List.of(post.getId()); 
+            List<Post> posts = List.of(post);
+            List<Long> postIds = List.of(post.getId());
             List<Object[]> viewCountsList = postViewRepository.findViewCountsByPostIds(postIds);
 
             System.out.println("entrou");
