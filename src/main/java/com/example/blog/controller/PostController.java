@@ -1,13 +1,10 @@
 package com.example.blog.controller;
 
-import com.example.blog.dtos.PostAnalyticsDto;
 import com.example.blog.model.Post;
 import com.example.blog.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,88 +20,87 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<Post> createPost(@RequestBody Post post) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        // Criação de um novo post
         Post savedPost = postService.createPost(post);
         return new ResponseEntity<>(savedPost, HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<List<Post>> getAllPosts() {
+        // Retorna todos os posts
         List<Post> posts = postService.getAllPosts();
         return new ResponseEntity<>(posts, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Post> getPostById(@PathVariable Long id) {
+        // Retorna post pelo ID
         Optional<Post> post = postService.getPostById(id);
-        if (post.isPresent()) {
-            return new ResponseEntity<>(post.get(), HttpStatus.OK);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @GetMapping("/title")
-    public ResponseEntity<Post> getPostByTitle(@RequestParam String title) {
-        Optional<Post> post = postService.getPostByTitle(title);
-        if (post.isPresent()) {
-            return new ResponseEntity<>(post.get(), HttpStatus.OK);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return post.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/customLink")
     public ResponseEntity<Post> getPostByCustomLink(@RequestParam String customLink) {
+        // Retorna post pelo link customizado
         Optional<Post> post = postService.getPostByCustomLink(customLink);
         return post.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<List<Post>> searchPosts(@RequestParam String searchTerm) {
-        List<Post> posts = postService.searchPosts(searchTerm);
-        if (posts.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-        return new ResponseEntity<>(posts, HttpStatus.OK);
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<Post> updatePost(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
-        return postService.getPostById(id)
-                .map(existingPost -> {
-                    if (updates.containsKey("title")) {
-                        existingPost.setTitle((String) updates.get("title"));
-                    }
+        // Atualiza os campos do post
+        Optional<Post> existingPostOptional = postService.getPostById(id);
 
-                    if (updates.containsKey("subTitle")) {
-                        existingPost.setSubTitle((String) updates.get("subTitle"));
-                    }
+        if (existingPostOptional.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
-                    if (updates.containsKey("category")) {
-                        existingPost.setCategory((String) updates.get("category"));
-                    }
+        Post existingPost = existingPostOptional.get();
 
-                    if (updates.containsKey("content")) {
-                        existingPost.setContent((String) updates.get("content"));
-                    }
+        updates.forEach((key, value) -> {
+            switch (key) {
+                case "title":
+                    existingPost.setTitle((String) value);
+                    break;
+                case "subTitle":
+                    existingPost.setSubTitle((String) value);
+                    break;
+                case "category":
+                    existingPost.setCategory((String) value);
+                    break;
+                case "content":
+                    existingPost.setContent((String) value);
+                    break;
+                case "imageUrl":
+                    existingPost.setImageUrl((String) value);
+                    break;
+                case "customLink":
+                    existingPost.setCustomLink((String) value);
+                    break;
+                case "readTime":
+                    existingPost.setReadTime((Integer) value);
+                    break;
+                default:
+                    break;
+            }
+        });
 
-                    return new ResponseEntity<>(postService.updatePost(existingPost), HttpStatus.OK);
-                })
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        Post updatedPost = postService.updatePost(existingPost);
+        return new ResponseEntity<>(updatedPost, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable Long id) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        String username = auth.getName();
+        // Deleta o post pelo ID
+        Optional<Post> post = postService.getPostById(id);
 
-        return postService.getPostById(id)
-                .map(post -> {
-                    postService.deletePost(id);
-                    return new ResponseEntity<Void>(HttpStatus.NO_CONTENT);
-                })
-                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        if (post.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        postService.deletePost(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
