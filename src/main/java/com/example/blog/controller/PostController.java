@@ -20,21 +20,18 @@ public class PostController {
 
     @PostMapping
     public ResponseEntity<Post> createPost(@RequestBody Post post) {
-        // Criação de um novo post
         Post savedPost = postService.createPost(post);
         return new ResponseEntity<>(savedPost, HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<List<Post>> getAllPosts() {
-        // Retorna todos os posts
         List<Post> posts = postService.getAllPosts();
         return new ResponseEntity<>(posts, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Post> getPostById(@PathVariable Long id) {
-        // Retorna post pelo ID
         Optional<Post> post = postService.getPostById(id);
         return post.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -42,15 +39,26 @@ public class PostController {
 
     @GetMapping("/customLink")
     public ResponseEntity<Post> getPostByCustomLink(@RequestParam String customLink) {
-        // Retorna post pelo link customizado
         Optional<Post> post = postService.getPostByCustomLink(customLink);
         return post.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @PostMapping("/{id}/like")
+    public ResponseEntity<Void> likePost(@PathVariable Long id) {
+        postService.incrementPostLikes(id); 
+        return ResponseEntity.ok().build(); 
+    }
+
+    @PostMapping("/{id}/unlike")
+    public ResponseEntity<Void> unlikePost(@PathVariable Long id) {
+        postService.decrementPostLikes(id); 
+        return ResponseEntity.ok().build(); 
+    }
+
+
     @PutMapping("/{id}")
     public ResponseEntity<Post> updatePost(@PathVariable Long id, @RequestBody Map<String, Object> updates) {
-        // Atualiza os campos do post
         Optional<Post> existingPostOptional = postService.getPostById(id);
 
         if (existingPostOptional.isEmpty()) {
@@ -93,7 +101,6 @@ public class PostController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(@PathVariable Long id) {
-        // Deleta o post pelo ID
         Optional<Post> post = postService.getPostById(id);
 
         if (post.isEmpty()) {

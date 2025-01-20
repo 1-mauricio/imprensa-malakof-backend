@@ -68,10 +68,11 @@ public class PostService {
         post.setImageUrl((String) result[8]);
         post.setVersion((Integer) result[7]);
         post.setCustomLink((String) result[9]);
+        post.setLikes((Long) result[10]);
 
-        post.setViewsThisWeek((Long) result[12]);
-        post.setViewsThisMonth((Long) result[11]);
-        post.setViewCount((Long) result[10]);
+        post.setViewsThisWeek((Long) result[13]);
+        post.setViewsThisMonth((Long) result[12]);
+        post.setViewCount((Long) result[11]);
 
         return post;
     }
@@ -133,6 +134,26 @@ public class PostService {
                         post.setViewsThisWeek(viewsThisWeek);
                         post.setViewsThisMonth(viewsThisMonth);
                     });
+        }
+    }
+
+    @Transactional
+    public void incrementPostLikes(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post não encontrado"));
+
+        post.setLikes(post.getLikes() + 1);
+        postRepository.save(post);
+    }
+
+    @Transactional
+    public void decrementPostLikes(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post não encontrado"));
+
+        if (post.getLikes() > 0) {
+            post.setLikes(post.getLikes() - 1);
+            postRepository.save(post);
         }
     }
 

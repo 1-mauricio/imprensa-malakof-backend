@@ -55,6 +55,9 @@ public class Post {
     @Column(length = 255, unique = true)
     @Getter @Setter private String customLink;
 
+    @Column(name = "likes", nullable = false)
+    @Getter @Setter private Long likes = 0L;
+
     public Post() {}
 
     public Post(String title, String subTitle, String category, LocalDateTime date, Integer readTime, String content, String imageUrl, String customLink) {
@@ -86,6 +89,7 @@ public class Post {
                 ", readTime=" + readTime +
                 ", content='" + content + '\'' +
                 ", imageUrl='" + imageUrl + '\'' +
+                ", likes=" + likes +
                 '}';
     }
 }
